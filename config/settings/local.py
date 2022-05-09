@@ -10,7 +10,7 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'config',
+        'NAME': 'humanscape',
         'USER': 'root',
         'PASSWORD': get_secret("MYSQL_LOCAL_PASSWORD"),
         'HOST': 'localhost',

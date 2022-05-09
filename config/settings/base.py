@@ -27,6 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Application definition
 
 PROJECT_APPS = [
+    'v1.icreat',
 ]
 
 THIRD_PARTY_APPS = [
@@ -144,3 +145,9 @@ CORS_ALLOW_HEADERS = (
 )
 
 APPEND_SLASH = False
+
+import os
+import sys
+
+PROJECT_ROOT = os.path.dirname(__file__)
+sys.path.insert(0, os.path.join(PROJECT_ROOT, 'v1'))
