@@ -14,7 +14,7 @@ services:
     stdin_open: true
     ports:
       - 8080:8080
-    entrypoint: sh run_for_deploy.sh
+    entrypoint: ./wait-for-it.sh humanscape_db:3306 -- sh run_for_deploy.sh
     environment:
       SECRET_KEY: "${SECRET_KEY}"
       MYSQL_USER: "${MYSQL_USER}"
