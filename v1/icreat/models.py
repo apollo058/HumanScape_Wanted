@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Icreat(models.Model):
+class Icreat(models.Model): 
     subject = models.TextField(verbose_name='과제명')
     sub_num = models.CharField(max_length=100, unique=True, verbose_name='과제번호')
     period = models.CharField(max_length=20, verbose_name='연구기간', blank=True)
