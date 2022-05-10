@@ -10,16 +10,7 @@ class IcreatSerializer(serializers.ModelSerializer):
         fields = (
             "subject","sub_num","period","boundary",
             "remark","institute","trial","goal_research",
-            "meddept"
+            "meddept","is_active"
             )
 
-
-class IcreatDeleteSerializer(serializers.ModelSerializer):
-    '''
-    작성자 : 남기윤
-    '''
-
-    class Meta:
-        model = Icreat
-        fields = ("is_active",)
 
