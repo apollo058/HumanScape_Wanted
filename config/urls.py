@@ -41,10 +41,13 @@ swagger_urlpatterns = [
 ]
 
 # If prod, collect static file for display swagger to client
+# 배포할때, 웹파일 긁어모을 때만 사용
+"""
 if not settings.DEBUG:
 	swagger_urlpatterns.append(
 		static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 	)
+"""
 
 urlpatterns = [
     path('admin/', admin.site.urls),
