@@ -1,4 +1,5 @@
 from .base import *
+import os
 
 DEBUG = False
 
@@ -17,3 +18,8 @@ DATABASES = {
         'PORT': os.environ.get("MYSQL_PORT")
     }
 }
+
+STATICFILES_DIRS = (
+		os.path.join(BASE_DIR, 'static'),
+)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

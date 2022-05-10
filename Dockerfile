@@ -19,4 +19,5 @@ RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
 # copy requirements.txt for install package
 COPY . .
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt

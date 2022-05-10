@@ -151,3 +151,9 @@ import sys
 
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, 'v1'))
+
+# FOR SWAGGER
+SWAGGER_SETTINGS = {
+	'USE_SESSION_AUTH': False,
+}
+
