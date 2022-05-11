@@ -18,12 +18,14 @@ class IcreatCreateView(CreateAPIView):
 
 class IcreatUpdateView(generics.GenericAPIView,
                         mixins.UpdateModelMixin,
-                        mixins.DestroyModelMixin):
+                        mixins.DestroyModelMixin,
+                        mixins.RetrieveModelMixin):
     """
     작성자: 하정현
 
-    데이터 수정/삭제
-    (PATCH) /api/vi/icreat/create/<str:subject_num>
+    데이터 수정/삭제/특정uuid불러오기
+    (GET)       /api/vi/icreat/create/<str:subject_num>
+    (PATCH)     /api/vi/icreat/create/<str:subject_num>
     (DELETE)    /api/vi/icreat/create/<str:subject_num>
     """
 
@@ -36,3 +38,6 @@ class IcreatUpdateView(generics.GenericAPIView,
     
     def delete(self, request, sub_num: str):
         return self.destroy(request, sub_num)
+
+    def get(self, request, sub_num: str):
+        return self.retrieve(request, sub_num)
