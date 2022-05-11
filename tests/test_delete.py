@@ -1,0 +1,42 @@
+from rest_framework.test import APITestCase
+from rest_framework import status
+
+from v1.icreat.models import Icreat
+
+class TestIcreatDelete(APITestCase):
+    """
+    작성자: 하정현
+
+    필수 구현사항이 아닌 데다, 마감 문제로
+    간단한 테스트 코드 구현만 함
+    """
+    UPLOAD_API = '/api/v1/icreat/create'
+    API = '/api/v1/icreat'
+    # 업로드
+    req = {
+        "subject"       : '조직구증식증 임상연구 네트워크 구축 및 운영(HLH)',
+        "sub_num"       : 'C130010',
+        "period"        : '3년',
+        "boundary"      : '국내다기관',
+        "remark"        : '관찰연구',
+        "institute"     : '서울아산병원',
+        "trial"         : "코호트",
+        "goal_research" : "120",
+        "meddept"       : 'Pediatrics'
+    }
+    
+    def setUp(self):
+        # 데이터 업로드
+        self.assertEqual(self.client.post(self.UPLOAD_API, data=self.req).status_code,
+                        201)
+
+    def test_delete(self):
+        sub_num = self.req['sub_num']
+
+        self.assertEqual(self.client.delete(f"{self.API}/{sub_num}").status_code,
+                        204)
+
+    def test_delete_failed(self):
+        sub_num = 'BDLKSJD'
+        self.assertEqual(self.client.delete(f"{self.API}/{sub_num}").status_code,
+                        404)

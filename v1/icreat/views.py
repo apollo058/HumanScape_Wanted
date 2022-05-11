@@ -1,3 +1,38 @@
 from django.shortcuts import render
+from rest_framework.generics import (
+    CreateAPIView,
+)
+from rest_framework import (mixins, generics)
 
-# Create your views here.
+from v1.icreat.serializers import IcreatSerializers
+from v1.icreat.models import Icreat
+
+class IcreatCreateView(CreateAPIView):
+    """
+    작성자 하정현:
+
+    데이터 생성 View
+    (POST)  /api/v1/icreat/create
+    """
+    serializer_class = IcreatSerializers
+
+class IcreatUpdateView(generics.GenericAPIView,
+                        mixins.UpdateModelMixin,
+                        mixins.DestroyModelMixin):
+    """
+    작성자: 하정현
+
+    데이터 수정/삭제
+    (PATCH) /api/vi/icreat/create/<str:subject_num>
+    (DELETE)    /api/vi/icreat/create/<str:subject_num>
+    """
+
+    serializer_class = IcreatSerializers
+    queryset = Icreat.objects.all()
+    lookup_field = 'sub_num'
+
+    def patch(self, request, sub_num: str):
+        return self.update(request, sub_num, partial=True)
+    
+    def delete(self, request, sub_num: str):
+        return self.destroy(request, sub_num)
