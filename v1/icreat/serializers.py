@@ -3,7 +3,7 @@ from .models import Icreat
 
 class IcreatSerializer(serializers.ModelSerializer):
     '''
-    작성자 : 남기윤
+    작성자 : 남기윤, 하정현
     '''
     class Meta:
         model = Icreat
@@ -13,4 +13,8 @@ class IcreatSerializer(serializers.ModelSerializer):
             "meddept","is_active"
             )
 
-
+    def update(self, instance, data):
+        # update시 is_active 수정 불가
+        if 'is_active' in data:
+            raise serializers.ValidationError("You can't modify is_active")
+        return super().update(instance, data)
