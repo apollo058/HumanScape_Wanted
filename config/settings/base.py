@@ -1,21 +1,5 @@
-import json
-
 from pathlib import Path
 
-from django.core.exceptions import ImproperlyConfigured
-
-
-with open("secrets.json") as f:
-    secrets = json.loads(f.read())
-
-
-# Keep secret keys in secrets.json
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError:
-        error_msg = "Set the {0} environment variable".format(setting)
-        raise ImproperlyConfigured(error_msg)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -28,12 +12,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 PROJECT_APPS = [
     'v1.icreat',
+    'v1.icreat_batch',
 ]
 
 THIRD_PARTY_APPS = [
     'corsheaders',
     'drf_yasg',
     'rest_framework',
+    'django_crontab',
 ]
 
 INSTALLED_APPS = [
@@ -146,14 +132,15 @@ CORS_ALLOW_HEADERS = (
 
 APPEND_SLASH = False
 
-import os
-import sys
-
-PROJECT_ROOT = os.path.dirname(__file__)
-sys.path.insert(0, os.path.join(PROJECT_ROOT, 'v1'))
 
 # FOR SWAGGER
 SWAGGER_SETTINGS = {
 	'USE_SESSION_AUTH': False,
 }
 
+CRONTAB_DJANGO_SETTINGS_MODULE = 'config.settings.local'
+
+# 매주 월요일 새벽 1시 실행
+CRONJOBS = [
+    ('* 1 * * 1', 'v1.icreat_batch.cron.batch_req', '>>'+f'{BASE_DIR}'+'/cron.log 2>&1'),
+]

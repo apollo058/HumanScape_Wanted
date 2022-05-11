@@ -1,13 +1,15 @@
 import requests
-import json
+import json, os
 from urllib import parse
-
-from config.settings.base import get_secret
 
 
 def get_data():
-    url = get_secret('url')
-    api_key = get_secret('api_key')
+    """
+        작성자 : 최승리
+        공공 데이터 포털에서 open api 데이터 조회
+    """
+    url = os.environ.get('URL')
+    api_key = os.environ.get('API_KEY')
     api_key_decode = parse.unquote(api_key)
     params ={
         'page' : 1,

@@ -1,5 +1,3 @@
-import time
-
 from datetime import datetime
 
 from django.db.utils import IntegrityError
@@ -10,38 +8,64 @@ from rest_framework.response import Response
 
 from ..icreat.models import Icreat
 from .utils import get_data
+from .models import BatchLog
+
 
 class IcreatBatchView(APIView):
+    """
+        작성자 : 최승리
+        공공 데이터 포털 조회된 데이터를 DB에 최신화 및 로깅
+    """
+    def set_col_name(self, after_data):
+        # 조회한 공공 데이터의 컬럼명을 Model과 매칭"
+        before_data = {
+                "subject" : after_data["과제명"],
+                "sub_num" : after_data["과제번호"],
+                "period" : after_data["연구기간"],
+                "boundary" : after_data["연구범위"],
+                "remark" : after_data["연구종류"],
+                "institute" : after_data["연구책임기관"],
+                "trial" : after_data["임상시험단계(연구모형)"],
+                "goal_research" : after_data["전체목표연구대상자수"],
+                "meddept" : after_data["진료과"]
+                }
+        return before_data
+
+    def set_batch_log(self, start_time, end_time, created_count, updated_count, created_list, updated_list):
+        # 로깅 테이블에 값 추가
+        BatchLog.objects.create(
+            start_time = start_time,
+            end_time = end_time,
+            created_count = created_count,
+            updated_count = updated_count,
+            created_list = created_list,
+            updated_list = updated_list,
+            )
+
     def post(self, request):
-        create_data = 0
-        update_data = 0
-        start_time = time.time()
+        created_count = 0
+        updated_count = 0
+        created_list = []
+        updated_list = []
+        start_time = datetime.now()
+
         batch_data = get_data()
         for data in batch_data['data']:
-            set_col_name_data = {
-            "subject"       : data["과제명"],
-            "sub_num"       : data["과제번호"],
-            "period"        : data["연구기간"],
-            "boundary"      : data["연구범위"],
-            "remark"        : data["연구종류"],
-            "institute"     : data["연구책임기관"],
-            "trial"         : data["임상시험단계(연구모형)"],
-            "goal_research" : data["전체목표연구대상자수"],
-            "meddept"       : data["진료과"]
-            }
+            set_col_name_data = self.set_col_name(data)
             try:
-                Icreat.objects.create(**set_col_name_data)
-                create_data += 1
+                create_data = Icreat.objects.create(**set_col_name_data)
+                created_list.append(create_data.sub_num)
+                created_count += 1
             except IntegrityError:
-                exist_data = (Icreat.objects
-                .filter(sub_num=data["과제번호"])
-                .values('subject', 'sub_num', 'period', 'boundary', 'remark', 'institute', 'trial', 'goal_research', 'meddept'))
+                exist_data = Icreat.objects.filter(sub_num=data["과제번호"]).values(*set_col_name_data.keys())
                 if exist_data[0] == set_col_name_data:
                     continue
                 else:
                     exist_data.update(**set_col_name_data, modified_at = datetime.now())
-                    update_data += 1
-        end_time = time.time()
-        print("WorkingTime: {} sec".format(end_time-start_time))
-        print({"create_data" : create_data, "update_data" : update_data})
+                    updated_count += 1
+                    updated_list.append(exist_data[0]['sub_num'])
+
+        end_time = datetime.now()
+        # 로깅
+        self.set_batch_log(start_time, end_time, created_count, updated_count, created_list, updated_list)
         return Response({'message' : "success!"}, status=status.HTTP_201_CREATED)
