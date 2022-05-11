@@ -11,13 +11,14 @@ def get_data():
     url = os.environ.get('URL')
     api_key = os.environ.get('API_KEY')
     api_key_decode = parse.unquote(api_key)
-    params ={
+    # open api가 요구하는 params
+    params = {
         'page' : 1,
         'perPage' : 999,
         'returnType' : 'JSON',
         'serviceKey' : api_key_decode,
     }
 
-    response = requests.get(url, params=params)
-    json_data = json.loads(response.text)
-    return json_data
+    response = requests.get(url, params=params) # open api로 request
+    json_data = json.loads(response.text) # 받은 데이터를 json 형식 변환
+    return json_data # 최종 값 리턴

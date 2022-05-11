@@ -32,7 +32,7 @@ class IcreatBatchView(APIView):
         return before_data
 
     def set_batch_log(self, start_time, end_time, created_count, updated_count, created_list, updated_list):
-        # 로깅 테이블에 값 추가
+        # 로그 테이블에 값 추가
         BatchLog.objects.create(
             start_time = start_time,
             end_time = end_time,
@@ -43,29 +43,32 @@ class IcreatBatchView(APIView):
             )
 
     def post(self, request):
+        # 로깅을 위한 변수 SET
         created_count = 0
         updated_count = 0
-        created_list = []
-        updated_list = []
+        created_list = [] # 생성된 sub_num list
+        updated_list = [] # 업데이트된 sub_num list
+
         start_time = datetime.now()
 
-        batch_data = get_data()
+        batch_data = get_data() # open api로부터 데이터 조회(.utils.py)
         for data in batch_data['data']:
             set_col_name_data = self.set_col_name(data)
             try:
                 create_data = Icreat.objects.create(**set_col_name_data)
                 created_list.append(create_data.sub_num)
                 created_count += 1
-            except IntegrityError:
+            except IntegrityError: # sub_num은 unique값이므로 중복 생성은 에러발생.
                 exist_data = Icreat.objects.filter(sub_num=data["과제번호"]).values(*set_col_name_data.keys())
                 if exist_data[0] == set_col_name_data:
                     continue
                 else:
+                    # 기존에 데이터는 존재하지만 일부 수정이 생겼을 경우 UPDATE
                     exist_data.update(**set_col_name_data, modified_at = datetime.now())
                     updated_count += 1
                     updated_list.append(exist_data[0]['sub_num'])
 
         end_time = datetime.now()
-        # 로깅
+        # 로그 테이블에 데이터 SET
         self.set_batch_log(start_time, end_time, created_count, updated_count, created_list, updated_list)
         return Response({'message' : "success!"}, status=status.HTTP_201_CREATED)
