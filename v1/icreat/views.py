@@ -1,4 +1,5 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from uritemplate import partial
 from .serializers import IcreatSerializer
 from .models import Icreat
 from datetime import datetime, timedelta
@@ -21,10 +22,10 @@ class SubjectDetailView(RetrieveUpdateDestroyAPIView):
         return self.retrieve(request, *args, **kwargs)
 
     def patch(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        return self.update(request, *args, **kwargs, partial = True)
     
     def delete(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        return self.update(request, *args, **kwargs, partial = True)
 
 class SubjectListView(ListCreateAPIView): #/api/v1/icreat/list
     model = Icreat
