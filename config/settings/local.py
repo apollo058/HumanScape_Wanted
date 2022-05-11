@@ -1,18 +1,25 @@
+import os
+import pymysql
+from dotenv import load_dotenv
+
 from .base import *
 
+load_dotenv()
 
 DEBUG = True
 
-SECRET_KEY = get_secret("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY"),
 
 ALLOWED_HOSTS = ['*']
 
+
+pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'humanscape',
         'USER': 'root',
-        'PASSWORD': get_secret("MYSQL_LOCAL_PASSWORD"),
+        'PASSWORD': os.environ.get("MYSQL_LOCAL_PASSWORD"),
         'HOST': 'localhost',
         'PORT': 3306
     }
