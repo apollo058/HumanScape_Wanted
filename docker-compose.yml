@@ -16,12 +16,15 @@ services:
       - 8080:8080
     entrypoint: ./wait-for-it.sh humanscape_db:3306 -- sh run_for_deploy.sh
     environment:
+      API_KEY: "${API_KEY}"
+      URL: "${URL}"
       SECRET_KEY: "${SECRET_KEY}"
       MYSQL_USER: "${MYSQL_USER}"
       MYSQL_USER_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       MYSQL_HOST: humanscape_db
       MYSQL_PORT: 3306
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      
     networks:
       - humanscape
 
