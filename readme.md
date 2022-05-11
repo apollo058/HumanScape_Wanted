@@ -33,24 +33,7 @@
 ## Directory Info.
 
 ```
-├─menu                      -menu add 디렉토리
-│  ├─migrations
-│  │  └─__pycache__
-│  └─__pycache__
-├─point_of_sale             -프로젝트 main configure
-│  ├─settings
-│  │  └─__pycache__
-│  └─__pycache__
-├─pos_log                   -poslog CRUD 및 검색 add 디렉토리
-│  ├─migrations    
-│  │  └─__pycache__
-│  ├─tests                  -unit test 디렉토리
-│  │  └─__pycache__
-│  └─__pycache__
-└─restaurants               -restaurant add 디렉토리
-    ├─migrations
-    │  └─__pycache__
-    └─__pycache__
+#최종 tree를 입력해주세요
 ```
 ## 실행 안내
 
