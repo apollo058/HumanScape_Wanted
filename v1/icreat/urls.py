@@ -1,7 +1,8 @@
 from django.urls import path
-from v1.icreat.views import *
+from v1.icreat.views import SubjectListView, SubjectDetailView
+
 
 urlpatterns = [
-    path('/create', IcreatCreateView.as_view()),
-    path('/<str:sub_num>', IcreatUpdateView.as_view())
+    path('<int:pk>',SubjectDetailView.as_view()),
+    path('/list',SubjectListView.as_view())
 ]

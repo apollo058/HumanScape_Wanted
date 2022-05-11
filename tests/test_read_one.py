@@ -1,10 +1,15 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 
-class TestIcreatReadOne(APITestCase):
+from v1.icreat.serializers import IcreatSerializer
+from v1.icreat.models import Icreat
 
-    UPLOAD_API = '/api/v1/icreat/create'
+class TestIcreatReadOne(APITestCase):
+    """
+    작성자: 하정현
+    """
     API = '/api/v1/icreat'
+    user_id = 0
 
     req = {
             "subject"       : '조직구증식증 임상연구 네트워크 구축 및 운영(HLH)',
@@ -15,20 +20,22 @@ class TestIcreatReadOne(APITestCase):
             "institute"     : '서울아산병원',
             "trial"         : "코호트",
             "goal_research" : "120",
-            "meddept"       : 'Pediatrics'
+            "meddept"       : 'Pediatrics',
+            'is_active'     : True
         }
 
     def setUp(self):
         # 업로드
-        self.assertEqual(self.client.post(self.UPLOAD_API, data=self.req).status_code,
-                        201)
+        s = IcreatSerializer(data=self.req)
+        s.is_valid()
+        s.save()
+        self.user_id = Icreat.objects.get(sub_num=self.req['sub_num']).id
     
     def test_read(self):
-        req = self.req.copy()
-        res = self.client.get(f"{self.API}/{req['sub_num']}")
+        res = self.client.get(f"{self.API}{self.user_id}")
         self.assertEqual(res.status_code, 200)
 
     def test_read_failed(self):
         # 없는 sub num
-        res = self.client.get(f"{self.API}/CVDSDFS", data={'period': '10년'})
+        res = self.client.get(f"{self.API}44444")
         self.assertEqual(res.status_code, 404)

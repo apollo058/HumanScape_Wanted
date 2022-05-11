@@ -1,43 +1,53 @@
-from django.shortcuts import render
-from rest_framework.generics import (
-    CreateAPIView,
-)
-from rest_framework import (mixins, generics)
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from uritemplate import partial
+from .serializers import IcreatSerializer
+from .models import Icreat
+from datetime import datetime, timedelta
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
 
-from v1.icreat.serializers import IcreatSerializers
 from v1.icreat.models import Icreat
 
-class IcreatCreateView(CreateAPIView):
-    """
-    작성자 하정현:
+'''
+작성자 : 남기윤, 하정현
+'''
 
-    데이터 생성 View
-    (POST)  /api/v1/icreat/create
-    """
-    serializer_class = IcreatSerializers
-
-class IcreatUpdateView(generics.GenericAPIView,
-                        mixins.UpdateModelMixin,
-                        mixins.DestroyModelMixin,
-                        mixins.RetrieveModelMixin):
-    """
-    작성자: 하정현
-
-    데이터 수정/삭제/특정uuid불러오기
-    (GET)       /api/vi/icreat/create/<str:subject_num>
-    (PATCH)     /api/vi/icreat/create/<str:subject_num>
-    (DELETE)    /api/vi/icreat/create/<str:subject_num>
-    """
-
-    serializer_class = IcreatSerializers
-    queryset = Icreat.objects.all()
-    lookup_field = 'sub_num'
-
-    def patch(self, request, sub_num: str):
-        return self.update(request, sub_num, partial=True)
+class SubjectDetailView(RetrieveUpdateDestroyAPIView):
+    model = Icreat
+    serializer_class = IcreatSerializer
     
-    def delete(self, request, sub_num: str):
-        return self.destroy(request, sub_num)
+    def get_queryset(self):
+        res = Icreat.objects.all()
+        return res
 
-    def get(self, request, sub_num: str):
-        return self.retrieve(request, sub_num)
+    def get(self, request, pk):
+        return self.retrieve(request, pk)
+
+    def patch(self, request, pk):
+        return self.update(request, pk, partial = True)
+    
+    def delete(self, request, pk):
+        """
+        is_active가 False로 처리되어야 한다.
+        """
+        obj = get_object_or_404(Icreat, id=pk)
+        if not obj.is_active:
+            # 이미 삭제처리됨
+            return Response({"error": "already deleted"}, status=status.HTTP_400_BAD_REQUEST)
+        obj.is_active = False
+        obj.save()
+        return Response({"is_active": obj.is_active}, status=status.HTTP_204_NO_CONTENT)
+
+class SubjectListView(ListCreateAPIView): #/api/v1/icreat/list
+    model = Icreat
+    serializer_class = IcreatSerializer
+
+    def get_queryset(self):
+        page = self.request.GET.get('page',1)
+        pagesize = 10
+        limit = pagesize * page
+        offset = limit -pagesize
+        a_week_ago = datetime.today() - timedelta(days = 7)
+        subjects = Icreat.objects.filter(modified_at__gte=a_week_ago)[offset:limit]
+        return subjects

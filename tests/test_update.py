@@ -2,15 +2,12 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 
 from v1.icreat.models import Icreat
+from v1.icreat.serializers import IcreatSerializer
 
 class TestIcreatUpdate(APITestCase):
     """
     작성자: 하정현
-
-    필수 구현사항이 아닌 데다, 마감 문제로
-    간단한 테스트 코드 구현만 함
     """
-    UPLOAD_API = '/api/v1/icreat/create'
     API = '/api/v1/icreat'
 
     req = {
@@ -22,19 +19,22 @@ class TestIcreatUpdate(APITestCase):
             "institute"     : '서울아산병원',
             "trial"         : "코호트",
             "goal_research" : "120",
-            "meddept"       : 'Pediatrics'
+            "meddept"       : 'Pediatrics',
+            'is_active'     : True
         }
 
     def setUp(self):
         # 업로드
-        self.assertEqual(self.client.post(self.UPLOAD_API, data=self.req).status_code,
-                        201)
+        s = IcreatSerializer(data=self.req)
+        s.is_valid()
+        s.save()
+        self.user_id = Icreat.objects.get(sub_num=self.req['sub_num']).id
     
     def test_udpate(self):
 
         # 데이터 수정하기
         req = self.req.copy()
-        res = self.client.patch(f"{self.API}/{req['sub_num']}", data={'period': '10년'})
+        res = self.client.patch(f"{self.API}{self.user_id}", data={'period': '10년'})
         self.assertEqual(res.status_code, 200)
         
         # 변경 확인
@@ -42,6 +42,12 @@ class TestIcreatUpdate(APITestCase):
         self.assertEqual(c.period, '10년')
 
     def test_update_failed(self):
-        # 없는 sub num
-        res = self.client.patch(f"{self.API}/CVDSDFS", data={'period': '10년'})
+        # 없는 유저
+        res = self.client.patch(f"{self.API}134532", data={'period': '10년'})
         self.assertEqual(res.status_code, 404)
+
+    def test_no_is_active(self):
+        # is_active 수정 불가
+        req = self.req.copy()
+        res = self.client.patch(f"{self.API}{self.user_id}", data={'is_active': False})
+        self.assertEqual(res.status_code, 400)
